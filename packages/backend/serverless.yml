@@ -1,0 +1,80 @@
+service: expense-tracker-backend
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-2
+  stage: dev
+  environment:
+    MONGO_URI: ${env:MONGO_URI}
+    JWT_SECRET: ${env:JWT_SECRET}
+
+functions:
+  createUser:
+    handler: handler.createUser
+    timeout: 30
+    events:
+      - http:
+          path: users/signup
+          method: post
+  loginUser:
+    handler: handler.authUser
+    timeout: 30
+    events:
+      - http:
+          path: users/signin
+          method: post
+  getExpenses:
+    handler: handler.getExpenses
+    timeout: 30
+    events:
+      - http:
+          path: expenses
+          method: get
+  getExpensesById:
+    handler: handler.getExpensesById
+    timeout: 30
+    events:
+      - http:
+          path: expenses/{id}
+          method: get
+  addExpense:
+    handler: handler.addExpense
+    timeout: 30
+    events:
+      - http:
+          path: expenses
+          method: post
+  updateExpense:
+    handler: handler.updateExpense
+    timeout: 30
+    events:
+      - http:
+          path: expenses/{id}
+          method: put
+  deleteExpense:
+    handler: handler.deleteExpense
+    timeout: 30
+    events:
+      - http:
+          path: expenses/{id}
+          method: delete
+
+plugins:
+  - serverless-offline
+
+resources:
+  Resources:
+    ExpensesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Expenses
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5

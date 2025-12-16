@@ -1,0 +1,171 @@
+{
+  "/home/philip/Desktop/nodeapps/personal-expense-tracker/packages/backend/serverless.yml": {
+    "versionFramework": "4.28.0",
+    "servicePath": "/home/philip/Desktop/nodeapps/personal-expense-tracker/packages/backend/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "expense-tracker-backend",
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs20.x",
+        "region": "us-east-1",
+        "stage": "dev",
+        "environment": {
+          "MONGO_URI": "mongodb+srv://philipoyelegbin:hWHjN7x3FRr2h3wK@expressdb.0io21lm.mongodb.net/?appName=ExpressDB/expense-tracker",
+          "JWT_SECRET": "<REDACTED>"
+        },
+        "versionFunctions": true
+      },
+      "functions": {
+        "getExpenses": {
+          "handler": "handler.getExpenses",
+          "timeout": 30,
+          "events": [
+            {
+              "http": {
+                "path": "expenses",
+                "method": "get"
+              }
+            }
+          ]
+        },
+        "addExpense": {
+          "handler": "handler.addExpense",
+          "timeout": 30,
+          "events": [
+            {
+              "http": {
+                "path": "expenses",
+                "method": "post"
+              }
+            }
+          ]
+        },
+        "updateExpense": {
+          "handler": "handler.updateExpense",
+          "timeout": 30,
+          "events": [
+            {
+              "http": {
+                "path": "expenses/{id}",
+                "method": "put"
+              }
+            }
+          ]
+        },
+        "deleteExpense": {
+          "handler": "handler.deleteExpense",
+          "timeout": 30,
+          "events": [
+            {
+              "http": {
+                "path": "expenses/{id}",
+                "method": "delete"
+              }
+            }
+          ]
+        }
+      },
+      "plugins": [
+        "serverless-offline"
+      ],
+      "resources": {
+        "Resources": {
+          "ExpensesTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "Expenses",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "ProvisionedThroughput": {
+                "ReadCapacityUnits": 5,
+                "WriteCapacityUnits": 5
+              }
+            }
+          }
+        }
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs20.x",
+      "region": "us-east-1",
+      "stage": "dev",
+      "environment": {
+        "MONGO_URI": "mongodb+srv://philipoyelegbin:hWHjN7x3FRr2h3wK@expressdb.0io21lm.mongodb.net/?appName=ExpressDB/expense-tracker",
+        "JWT_SECRET": "<REDACTED>"
+      },
+      "versionFunctions": true
+    },
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "serviceRawFile": "service: expense-tracker-backend\n\nprovider:\n  name: aws\n  runtime: nodejs20.x\n  region: us-east-1\n  stage: dev\n  environment:\n    MONGO_URI: ${env:MONGO_URI}\n    JWT_SECRET: ${env:JWT_SECRET}\n\nfunctions:\n  getExpenses:\n    handler: handler.getExpenses\n    timeout: 30\n    events:\n      - http:\n          path: expenses\n          method: get\n  addExpense:\n    handler: handler.addExpense\n    timeout: 30\n    events:\n      - http:\n          path: expenses\n          method: post\n  updateExpense:\n    handler: handler.updateExpense\n    timeout: 30\n    events:\n      - http:\n          path: expenses/{id}\n          method: put\n  deleteExpense:\n    handler: handler.deleteExpense\n    timeout: 30\n    events:\n      - http:\n          path: expenses/{id}\n          method: delete\n\nplugins:\n  - serverless-offline\n\nresources:\n  Resources:\n    ExpensesTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: Expenses\n        AttributeDefinitions:\n          - AttributeName: \"id\"\n            AttributeType: \"S\"\n        KeySchema:\n          - AttributeName: \"id\"\n            KeyType: \"HASH\"\n        ProvisionedThroughput:\n          ReadCapacityUnits: 5\n          WriteCapacityUnits: 5\n",
+    "command": [],
+    "options": {
+      "help": true
+    },
+    "orgId": "196b6a4c-ff6b-470b-8b56-239683f51992",
+    "orgName": "kloudprince",
+    "userId": "BYrzffg8KNWkPtWLHC",
+    "userName": "kloudprince",
+    "serviceProviderAwsAccountId": "226290659927",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:226290659927:stack/expense-tracker-backend-dev/d60b8d20-d9b3-11f0-9ec4-1253905989c9",
+    "serviceProviderAwsCfStackCreated": "2025-12-15T12:44:46.332Z",
+    "serviceProviderAwsCfStackUpdated": "2025-12-15T13:19:12.799Z",
+    "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "DeleteExpenseLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:226290659927:function:expense-tracker-backend-dev-deleteExpense:3",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-expense-tracker-backend-dev-DeleteExpenseLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "GetExpensesLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:226290659927:function:expense-tracker-backend-dev-getExpenses:3",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-expense-tracker-backend-dev-GetExpensesLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "AddExpenseLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:226290659927:function:expense-tracker-backend-dev-addExpense:3",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-expense-tracker-backend-dev-AddExpenseLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "UpdateExpenseLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:226290659927:function:expense-tracker-backend-dev-updateExpense:3",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-expense-tracker-backend-dev-UpdateExpenseLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServiceEndpoint",
+        "OutputValue": "https://rgo6eoe6ee.execute-api.us-east-1.amazonaws.com/dev",
+        "Description": "URL of the service endpoint",
+        "ExportName": "sls-expense-tracker-backend-dev-ServiceEndpoint"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-us-east-1-fd1a609e-d216",
+        "ExportName": "sls-expense-tracker-backend-dev-ServerlessDeploymentBucketName"
+      }
+    ]
+  }
+}
