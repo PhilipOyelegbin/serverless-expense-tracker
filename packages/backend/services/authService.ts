@@ -21,10 +21,10 @@ export const createUserService = async (user: User) => {
     email: user.email,
     password: hashedPassword,
   });
-  delete newUser.password;
   return { newUser };
 };
 
+// Function to login a user
 export const loginUserService = async (user: User) => {
   const { db } = await connectToDatabase();
   const storedUser = await db
@@ -42,6 +42,6 @@ export const loginUserService = async (user: User) => {
     throw new Error("Invalid password");
   }
 
-  const token = generateJWT(storedUser._id, storedUser.email);
+  const token = generateJWT(storedUser._id.toString(), storedUser.email);
   return { token };
 };

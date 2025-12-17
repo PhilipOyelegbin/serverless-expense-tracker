@@ -1,7 +1,7 @@
 import * as argon from "argon2";
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 const JWT_EXPIRATION = "1h";
 
 // Hash password using Argon2

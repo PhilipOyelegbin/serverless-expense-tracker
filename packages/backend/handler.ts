@@ -1,12 +1,16 @@
-import { APIGatewayEvent } from "aws-lambda";
-import { createUserService, loginUserService } from "./services/authService";
+import type { APIGatewayEvent } from "aws-lambda";
 import {
-  getExpensesService,
   addExpenseService,
-  updateExpenseService,
+  createUserService,
   deleteExpenseService,
   getExpenseByIdService,
-} from "./services/expenseService";
+  getExpensesService,
+  listExpensesService,
+  loginUserService,
+  spendingByCategoryService,
+  updateExpenseService,
+  totalSpendingByMonthService,
+} from "./services";
 
 // Lambda function to create a new user
 export const createUser = async (event: APIGatewayEvent) => {
@@ -116,7 +120,13 @@ export const getExpensesById = async (event: APIGatewayEvent) => {
         body: JSON.stringify({ message: "Authorization token missing" }),
       };
     }
-    const expenseId = event.pathParameters!.id;
+    const expenseId = event.pathParameters?.id;
+    if (!expenseId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Expense ID is required" }),
+      };
+    }
     const result = await getExpenseByIdService(expenseId, token);
     if (!result.expenses || result.expenses.length === 0) {
       return {
@@ -130,7 +140,59 @@ export const getExpensesById = async (event: APIGatewayEvent) => {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Expense found",
+        message: "Expenses retrieved successfully",
+        expenses: result.expenses,
+      }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Failed to fetch expenses",
+        error: error,
+      }),
+    };
+  }
+};
+
+// Lambda function to list expenses with optional filters
+export const listExpenses = async (event: APIGatewayEvent) => {
+  const token = event.headers?.Authorization?.split(" ")[1];
+  if (!token) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Authorization token missing" }),
+    };
+  }
+
+  const { startDate, endDate, category } = event.queryStringParameters || {};
+  if (!startDate || !endDate) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Start date and end date are required" }),
+    };
+  }
+
+  try {
+    const params =
+      category !== undefined
+        ? { startDate, endDate, category }
+        : { startDate, endDate };
+    const result = await listExpensesService(params as any, token);
+    if (!result.expenses || result.expenses.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({
+          message: "No expenses found",
+          expenses: [],
+        }),
+      };
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Expenses retrieved successfully",
         expenses: result.expenses,
       }),
     };
@@ -155,9 +217,7 @@ export const addExpense = async (event: APIGatewayEvent) => {
     };
   }
 
-  const { amount, description, category, date, userId } = JSON.parse(
-    event.body!
-  );
+  const { amount, description, category, date } = JSON.parse(event.body!);
   try {
     const result = await addExpenseService(
       {
@@ -193,6 +253,12 @@ export const updateExpense = async (event: APIGatewayEvent) => {
     };
   }
   const expenseId = event.pathParameters!.id;
+  if (!expenseId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Expense ID is required" }),
+    };
+  }
   const { amount, description, category, date } = JSON.parse(event.body!);
   try {
     const result = await updateExpenseService(
@@ -231,6 +297,12 @@ export const deleteExpense = async (event: APIGatewayEvent) => {
     };
   }
   const expenseId = event.pathParameters!.id;
+  if (!expenseId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Expense ID is required" }),
+    };
+  }
 
   try {
     await deleteExpenseService(expenseId, token);
@@ -243,6 +315,76 @@ export const deleteExpense = async (event: APIGatewayEvent) => {
       statusCode: 500,
       body: JSON.stringify({
         message: "Failed to delete expense",
+        error: error,
+      }),
+    };
+  }
+};
+
+// Lambda function to get total spending by month within a date range
+export const totalSpendingByMonth = async (event: APIGatewayEvent) => {
+  const token = event.headers?.Authorization?.split(" ")[1];
+  if (!token) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Authorization token missing" }),
+    };
+  }
+
+  const { startDate, endDate } = event.queryStringParameters || {};
+  if (!startDate || !endDate) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Start date and end date are required" }),
+    };
+  }
+
+  try {
+    const result = await totalSpendingByMonthService(token, startDate, endDate);
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Total spending by month retrieved successfully",
+        spendingByMonth: result,
+      }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Failed to fetch total spending by month",
+        error: error,
+      }),
+    };
+  }
+};
+
+// Lambda function to get spending by category
+export const spendingByCategory = async (event: APIGatewayEvent) => {
+  const token = event.headers?.Authorization?.split(" ")[1];
+  if (!token) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Authorization token missing" }),
+    };
+  }
+
+  try {
+    const result = await spendingByCategoryService(token);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Spending by category retrieved successfully",
+        spendingByCategory: result,
+      }),
+    };
+  } catch (error) {
+    console.error("Error fetching spending by category:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Failed to fetch spending by category",
         error: error,
       }),
     };

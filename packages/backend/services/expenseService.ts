@@ -2,11 +2,27 @@ import { connectToDatabase } from "../config/dbConfig";
 import { decodeToken } from "../helper";
 import { ObjectId } from "mongodb";
 
+const predefinedCategories = [
+  "Food",
+  "Transport",
+  "Entertainment",
+  "Utilities",
+  "Health",
+  "Education",
+  "Other",
+];
+
 interface Expense {
   amount: number;
   description: string;
   category: string;
   date: string;
+}
+
+interface ListExpensesParams {
+  startDate: string;
+  endDate: string;
+  category?: string;
 }
 
 // Function to fetch all expenses
@@ -21,6 +37,7 @@ export const getExpensesService = async (token: string) => {
   return { expenses };
 };
 
+// Function to fetch a single expense by ID
 export const getExpenseByIdService = async (
   expenseId: string,
   token: string
@@ -34,10 +51,47 @@ export const getExpenseByIdService = async (
   return { expenses };
 };
 
+// Function to list expenses with optional date range and category filters
+export const listExpensesService = async (
+  filters: ListExpensesParams,
+  token: string
+) => {
+  const { db } = await connectToDatabase();
+  const decodedToken = await decodeToken(token);
+  const query: any = {
+    userId: decodedToken.id,
+    date: {
+      $gte: new Date(filters.startDate),
+      $lte: new Date(filters.endDate),
+    },
+  };
+
+  if (filters.category) {
+    query.category = filters.category;
+  }
+
+  const expenses = await db.collection("expenses").find(query).toArray();
+  return { expenses };
+};
+
 // Function to add a new expense
 export const addExpenseService = async (expense: Expense, token: string) => {
-  const decodedToken = await decodeToken(token);
   const { db } = await connectToDatabase();
+  const decodedToken = await decodeToken(token);
+
+  const isPredefinedCategories = predefinedCategories.includes(
+    expense.category
+  );
+  if (!isPredefinedCategories) {
+    const existingCategory = await db
+      .collection("categories")
+      .findOne({ userId: decodedToken.id, category: expense.category });
+    if (!existingCategory) {
+      await db
+        .collection("categories")
+        .insertOne({ userId: decodedToken.id, category: expense.category });
+    }
+  }
   const newExpense = await db
     .collection("expenses")
     .insertOne({ ...expense, userId: decodedToken.id });
