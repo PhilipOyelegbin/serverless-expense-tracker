@@ -1,29 +1,11 @@
 import { connectToDatabase } from "../config/dbConfig";
 import { decodeToken } from "../helper";
 import { ObjectId } from "mongodb";
-
-const predefinedCategories = [
-  "Food",
-  "Transport",
-  "Entertainment",
-  "Utilities",
-  "Health",
-  "Education",
-  "Other",
-];
-
-interface Expense {
-  amount: number;
-  description: string;
-  category: string;
-  date: Date;
-}
-
-interface ListExpensesParams {
-  startDate: Date;
-  endDate: Date;
-  category?: string;
-}
+import {
+  predefinedCategories,
+  type ExpenseInput,
+  type ListExpensesParams,
+} from "./../../../../packages/types/src/index";
 
 // Function to fetch all expenses
 export const getExpensesService = async (token: string) => {
@@ -75,7 +57,10 @@ export const listExpensesService = async (
 };
 
 // Function to add a new expense
-export const addExpenseService = async (expense: Expense, token: string) => {
+export const addExpenseService = async (
+  expense: ExpenseInput,
+  token: string
+) => {
   const { db } = await connectToDatabase();
   const decodedToken = await decodeToken(token);
 
@@ -103,7 +88,7 @@ export const addExpenseService = async (expense: Expense, token: string) => {
 // Function to update an expense
 export const updateExpenseService = async (
   expenseId: string,
-  expense: Expense,
+  expense: ExpenseInput,
   token: string
 ) => {
   const decodedToken = await decodeToken(token);

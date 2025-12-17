@@ -1,13 +1,9 @@
 import { connectToDatabase } from "../config/dbConfig";
 import { generateJWT, hashPassword, verifyPassword } from "../helper";
-
-interface User {
-  email: string;
-  password: string;
-}
+import type { UserInput } from "../../../../packages/types/src";
 
 // Function to create a new user
-export const createUserService = async (user: User) => {
+export const createUserService = async (user: UserInput) => {
   const { db } = await connectToDatabase();
   const hashedPassword = await hashPassword(user.password);
   const existingUser = await db
@@ -25,7 +21,7 @@ export const createUserService = async (user: User) => {
 };
 
 // Function to login a user
-export const loginUserService = async (user: User) => {
+export const loginUserService = async (user: UserInput) => {
   const { db } = await connectToDatabase();
   const storedUser = await db
     .collection("users")
