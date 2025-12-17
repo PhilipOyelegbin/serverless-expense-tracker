@@ -16,12 +16,12 @@ interface Expense {
   amount: number;
   description: string;
   category: string;
-  date: string;
+  date: Date;
 }
 
 interface ListExpensesParams {
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   category?: string;
 }
 
@@ -92,6 +92,8 @@ export const addExpenseService = async (expense: Expense, token: string) => {
         .insertOne({ userId: decodedToken.id, category: expense.category });
     }
   }
+  const formatDate = new Date(expense.date);
+  expense.date = formatDate;
   const newExpense = await db
     .collection("expenses")
     .insertOne({ ...expense, userId: decodedToken.id });
@@ -106,6 +108,8 @@ export const updateExpenseService = async (
 ) => {
   const decodedToken = await decodeToken(token);
   const { db } = await connectToDatabase();
+  const formatDate = new Date(expense.date);
+  expense.date = formatDate;
   const result = await db
     .collection("expenses")
     .updateOne(

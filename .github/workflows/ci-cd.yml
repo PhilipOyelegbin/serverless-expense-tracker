@@ -1,0 +1,100 @@
+name: CI/CD Pipeline to AWS
+
+on:
+    push:
+        branches: [main, staging, clean]
+    pull_request:
+        branches: [main, staging, clean]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "24"
+
+            - name: Install dependencies
+              run: |
+                  pnpm install
+
+            - name: Run linter
+              run: |
+                  pnpm run lint
+
+            - name: Run tests
+              run: |
+                  pnpm test
+
+            - name: Build app
+              run: |
+                  pnpm build
+
+    deploy:
+        runs-on: ubuntu-latest
+        needs: build
+        if: github.ref == 'refs/heads/main'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up AWS CLI
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: "eu-west-2"
+
+            # Deploy backend to AWS Lambda using Serverless Framework
+            - name: Create .env file for backend
+              run: |
+                  tee apps/backend/.env > /dev/null <<-EOF
+                  MONGO_URI=${{ secrets.MONGO_URI }}
+                  JWT_SECRET=${{ secrets.JWT_SECRET }}
+                  EOF
+
+            - name: Deploy Backend to AWS Lambda
+              run: |
+                  cd apps/backend/
+                  pnpm install -g serverless
+                  serverless deploy
+
+            # Deploy frontend to AWS S3
+            # - name: Deploy to S3
+            #   run: |
+            #       aws s3 sync dist/ s3://expense-tracker --delete
+
+            # Option 2: Deploy to AWS Elastic Beanstalk (for back-end or full-stack apps)
+            # - name: Deploy to Elastic Beanstalk
+            #   run: |
+            #     eb init -p node.js my-app --region ueu-west-2  # Initialize EB app
+            #     eb deploy  # Deploy the application to EB
+
+            # Option 3: Deploy to EC2 (for Node.js app, via SSH)
+            # - name: Deploy to EC2
+            #   run: |
+            #     ssh -i /path/to/your-ec2-key.pem ec2-user@ec2-instance-public-ip "cd /path/to/app && git pull && npm install && pm2 restart app"
+
+    cleanup:
+        runs-on: ubuntu-latest
+        needs: deploy
+        if: github.ref == 'refs/heads/clean'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up AWS CLI
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: "eu-west-2"
+
+            - name: Clean up resources
+              run: |
+                  echo "Cleaning up resources..."
+                  serverless remove

@@ -10,7 +10,7 @@ import {
   spendingByCategoryService,
   updateExpenseService,
   totalSpendingByMonthService,
-} from "./services";
+} from "./src/services";
 
 // Lambda function to create a new user
 export const createUser = async (event: APIGatewayEvent) => {

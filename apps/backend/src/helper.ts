@@ -29,6 +29,6 @@ export const decodeToken = (token: string): any => {
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch (error) {
-    throw new Error("Invalid token");
+    throw new Error(`Invalid token: ${error}`);
   }
 };

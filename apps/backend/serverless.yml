@@ -38,6 +38,13 @@ functions:
       - http:
           path: expenses/{id}
           method: get
+  listExpenses:
+    handler: handler.listExpenses
+    timeout: 30
+    events:
+      - http:
+          path: expenses/list
+          method: get
   addExpense:
     handler: handler.addExpense
     timeout: 30
@@ -59,22 +66,36 @@ functions:
       - http:
           path: expenses/{id}
           method: delete
+  totalSpendingByMonth:
+    handler: handler.totalSpendingByMonth
+    timeout: 30
+    events:
+      - http:
+          path: expenses/total-spending-by-month
+          method: get
+  spendingByCategory:
+    handler: handler.spendingByCategory
+    timeout: 30
+    events:
+      - http:
+          path: expenses/spending-by-category
+          method: get
 
 plugins:
   - serverless-offline
 
-resources:
-  Resources:
-    ExpensesTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: Expenses
-        AttributeDefinitions:
-          - AttributeName: "id"
-            AttributeType: "S"
-        KeySchema:
-          - AttributeName: "id"
-            KeyType: "HASH"
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+# resources:
+#   Resources:
+#     ExpensesTable:
+#       Type: AWS::DynamoDB::Table
+#       Properties:
+#         TableName: Expenses
+#         AttributeDefinitions:
+#           - AttributeName: "id"
+#             AttributeType: "S"
+#         KeySchema:
+#           - AttributeName: "id"
+#             KeyType: "HASH"
+#         ProvisionedThroughput:
+#           ReadCapacityUnits: 5
+#           WriteCapacityUnits: 5
