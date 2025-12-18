@@ -38,13 +38,6 @@ functions:
       - http:
           path: expenses/{id}
           method: get
-  listExpenses:
-    handler: handler.listExpenses
-    timeout: 30
-    events:
-      - http:
-          path: expenses/list
-          method: get
   addExpense:
     handler: handler.addExpense
     timeout: 30
