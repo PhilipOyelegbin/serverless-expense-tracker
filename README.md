@@ -9,8 +9,34 @@ Before starting, ensure you have the following installed on your machine:
 - **Node.js**: `v20.x` or higher (LTS recommended)
 - **pnpm**: `v9.x` or higher (`npm install -g pnpm`)
 - **AWS CLI**: Configured with active credentials (`aws configure`)
+- **MongoDB Atlas account**: Setup for your database connection
+- **Serverless Framework**: for deployment (optional)
 
-* **Serverless Framework**: for deployment (optional)
+Check versions:
+
+```bash
+node -v
+pnpm -v
+aws --version
+```
+
+---
+
+## Repository Structure
+
+```
+personal-expense-tracker/
+├─ .github/             # CI/CD pipeline
+├─ apps/
+│ ├─ frontend/          # React frontend
+│ └─ backend/           # Serverless backend (AWS Lambda)
+├─ packages/
+│ └─ types/             # Shared TypeScript types
+├─ .gitignore
+├─ pnpm-workspace.yaml
+├─ package.json
+└─ README.md
+```
 
 ---
 
@@ -128,8 +154,8 @@ To ensure a seamless development experience and maintain environmental hygiene, 
 
 - **Consistency**: Eliminates "it works on my machine" issues by deploying from a clean, standardized runner.
 - **Cost Control**: Automated cleanup ensures you only pay for the resources you are actively using.
-- **Reliability**: Integrated testing prevents broken code from ever reaching your live API.
+- **Reliability**: Integrated testing prevents broken code from ever reaching your production environment.
 
 > **Note**: Ensure you have added your `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `MONGODB_URI` to your **GitHub Repository Secrets** for the workflows to authenticate correctly.
 
-**Would you like me to generate the actual `.github/workflows/deploy.yml` file content so you can drop it straight into your repository?**
+---
