@@ -79,7 +79,7 @@ export const getExpenses = async (event: APIGatewayEvent) => {
     const token = authHeader?.split(" ")[1];
     if (!token) {
       return {
-        statusCode: 401,
+        statusCode: 400,
         body: JSON.stringify({ message: "Authorization token missing" }),
       };
     }

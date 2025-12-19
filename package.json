@@ -13,7 +13,7 @@
     "dev": "pnpm -r run dev",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
-    "deploy": "cd apps/backend && cdk deploy"
+    "start": "pnpm -r run start"
   },
   "keywords": [],
   "author": "",

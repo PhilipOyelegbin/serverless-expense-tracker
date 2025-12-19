@@ -28,11 +28,15 @@ export const ExpenseForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
       className="p-6 bg-white rounded-xl shadow-sm border border-gray-100 space-y-4"
     >
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700"
+        >
           Description
         </label>
         <input
           type="text"
+          id="description"
           required
           className="w-full mt-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
           value={form.description}
@@ -40,11 +44,15 @@ export const ExpenseForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="amount"
+          className="block text-sm font-medium text-gray-700"
+        >
           Amount
         </label>
         <input
           type="number"
+          id="amount"
           required
           className="w-full mt-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
           value={form.amount}
@@ -54,9 +62,15 @@ export const ExpenseForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Date</label>
+        <label
+          htmlFor="date"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Date
+        </label>
         <input
           type="date"
+          id="date"
           required
           className="w-full mt-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
           value={form.date}
@@ -64,11 +78,15 @@ export const ExpenseForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="category"
+          className="block text-sm font-medium text-gray-700"
+        >
           Category
         </label>
         <select
           className="w-full mt-1 p-2 border rounded-md"
+          id="category"
           value={form.category}
           onChange={(e) => setForm({ ...form, category: e.target.value })}
         >

@@ -28,8 +28,8 @@ export interface ExpenseInput {
 }
 
 export interface ListExpensesParams {
-  readonly startDate: string;
-  readonly endDate: string;
+  readonly startDate?: string;
+  readonly endDate?: string;
   readonly category?: string;
 }
 

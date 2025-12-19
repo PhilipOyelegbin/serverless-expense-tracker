@@ -27,7 +27,7 @@ export const loginUserService = async (user: UserInput) => {
     .collection("users")
     .findOne({ email: user.email });
   if (!storedUser) {
-    throw new Error("User not found");
+    throw new Error("Invalid credentials");
   }
 
   const isPasswordValid = await verifyPassword(
@@ -35,7 +35,7 @@ export const loginUserService = async (user: UserInput) => {
     storedUser.password
   );
   if (!isPasswordValid) {
-    throw new Error("Invalid password");
+    throw new Error("Invalid credentials");
   }
 
   const token = generateJWT(storedUser._id.toString(), storedUser.email);
