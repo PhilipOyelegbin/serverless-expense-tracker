@@ -1,4 +1,5 @@
 service: expense-tracker-backend
+frameworkVersion: "3"
 
 provider:
   name: aws
