@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "sls offline start",
+    "dev": "serverless offline start",
     "build": "sls dev",
     "start": "sls deploy",
+    "clean": "sls remove",
     "lint:fix": "eslint src --ext .ts --fix",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -26,8 +27,8 @@
     "eslint": "^9.39.2",
     "eslint-plugin-functional": "^9.0.2",
     "globals": "^16.5.0",
-    "serverless": "^4.28.0",
-    "serverless-offline": "^14.4.0",
+    "serverless": "^3.40.0",
+    "serverless-offline": "^13.9.0",
     "typescript-eslint": "^8.50.0",
     "vitest": "^4.0.16"
   },
