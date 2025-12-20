@@ -1,0 +1,12 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "functional", "immutable"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "functional/no-let": "error",
+    "functional/immutable-data": "error",
+    "complexity": ["error", 5],
+    "@typescript-eslint/explicit-function-return-type": "off"
+  }
+}

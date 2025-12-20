@@ -1,14 +1,15 @@
 {
   "name": "personal-expense-tracker",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r run dev",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "start": "pnpm -r run start"
   },
   "keywords": [],
   "author": "",
@@ -16,10 +17,14 @@
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "aws-cdk": "^2.1034.0",
+    "aws-cdk-lib": "^2.232.2",
+    "constructs": "^10.4.4",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.5.0",
     "prettier": "^3.7.4",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0"
   }

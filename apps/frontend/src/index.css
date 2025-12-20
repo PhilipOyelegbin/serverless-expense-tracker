@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  line-height: 1.5;
+}
+
+:root {
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
