@@ -34,6 +34,7 @@ jobs:
       - name: Install serverless plugins
         run: |
           cd apps/backend/
+          pnpm add -D serverless-esbuild esbuild
           serverless plugin install -n serverless-esbuild
 
       - name: Run tests
