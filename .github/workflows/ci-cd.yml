@@ -78,8 +78,9 @@ jobs:
         with:
           version: 9
 
-      - name: Install serverless globally
+      - name: Install dependencies
         run: |
+          pnpm install --no-frozen-lockfile
           pnpm install -g serverless@3.39.0
 
       - name: Set up AWS CLI
@@ -92,8 +93,7 @@ jobs:
       - name: Deploy Backend to AWS Lambda
         run: |
           cd apps/backend/
-          npx serverless plugin install -n serverless-esbuild || true
-          npm install serverless-esbuild esbuild --save-dev
+          pnpm add -D serverless-esbuild esbuild
           serverless deploy --stage prod
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
@@ -102,6 +102,13 @@ jobs:
           npm_config_arch: "x64"
           npm_config_target_platform: "linux"
           npm_config_build_from_source: "true"
+
+      - name: Deploy Frontend to AWS S3
+        run: |
+          cd apps/frontend/
+          pnpm install
+          pnpm build
+          aws s3 sync dist/ s3://expense-tracker-0byqods6 --delete
 
   cleanup:
     runs-on: ubuntu-latest
