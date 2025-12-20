@@ -1,6 +1,6 @@
 import { connectToDatabase } from "../config/dbConfig";
 import { generateJWT, hashPassword, verifyPassword } from "../helper";
-import type { UserInput } from "../../../../packages/types/src";
+import type { UserInput } from "@expense-tracker/types";
 
 // Function to create a new user
 export const createUserService = async (user: UserInput) => {

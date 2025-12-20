@@ -124,6 +124,7 @@ VITE_BASE_API_URL=https://your-api-url
 | **"Property 'toBeInTheDocument' does not exist"** | Vitest Types not loaded     | Ensure `apps/frontend/src/test/setup.ts` is imported in `vite.config.ts`.        |
 | **403 Forbidden on API**                          | Missing Auth Header         | Ensure your `Authorization: Bearer <token>` is being sent in Axios interceptors. |
 | **CORS Errors**                                   | API Gateway Config          | Check your Lambda response headers include `Access-Control-Allow-Origin`.        |
+| **Argon2 Errors**                                 | Native dependency issue     | Specifically include argon2 with native bindings.        |
 
 ---
 
@@ -147,6 +148,27 @@ To ensure a seamless development experience and maintain environmental hygiene, 
 - **Continuous Deployment**: Every push/pull-request to the `main` branch triggers an automated pipeline that executes `serverless deploy`. This ensures your production environment always reflects the latest stable code.
 
 - **Infrastructure Cleanup**: To avoid "infrastructure drift" and unnecessary AWS charges, a cleanup workflow is configured. This can be triggered manually or set to run automatically when a pull-request is merged and closed, executing `serverless remove` to tear down temporary stacks.
+
+---
+
+## Deployed Link
+
+**GitHub Repo:** https://github.com/PhilipOyelegbin/serverless-expense-tracker
+
+**Frontend Endpoint:** http://expense-tracker-0byqods6.s3-website.eu-west-2.amazonaws.com/dashboard
+
+**Backend Endpoints:**
+- POST: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/users/signup
+- POST: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/users/signin
+- GET: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses
+- GET: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/{id}
+- POST: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses
+- PUT: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/{id}
+- DELETE: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/{id}
+- GET: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/total-spending-by-month
+- GET: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/spending-by-category 
+
+![snapshot](./preview.png)
 
 ---
 

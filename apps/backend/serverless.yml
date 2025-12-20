@@ -1,4 +1,4 @@
-service: expense-tracker-backend
+service: expense-tracker-app
 frameworkVersion: "3"
 useDotenv: true
 
@@ -6,10 +6,37 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: eu-west-2
+  architecture: x86_64
   stage: dev
   environment:
     MONGO_URI: ${env:MONGO_URI}
     JWT_SECRET: ${env:JWT_SECRET}
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    target: "node20"
+    platform: "node"
+    external:
+      - argon2
+    keepNames: true
+    tsconfig: tsconfig.json
+    exclude: ["aws-sdk"]
+    entryPoints:
+      - apps/backend/handler.ts
+    
+package:
+  patterns:
+    - "!**"
+    - "apps/backend/**"
+    - "packages/types/**"
+    - "node_modules/.pnpm/**"
+    - "node_modules/.pnpm/**/node_modules/argon2/**"
+    - "node_modules/.pnpm/**/node_modules/argon2/**/*.node"
+  individually: false
+  excludeDevDependencies: false
 
 functions:
   createUser:
@@ -25,6 +52,7 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
   loginUser:
     handler: handler.authUser
     timeout: 30
@@ -38,6 +66,7 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
   getExpenses:
     handler: handler.getExpenses
     timeout: 30
@@ -51,6 +80,7 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
   getExpensesById:
     handler: handler.getExpensesById
     timeout: 30
@@ -64,6 +94,7 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
   addExpense:
     handler: handler.addExpense
     timeout: 30
@@ -77,6 +108,7 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
   updateExpense:
     handler: handler.updateExpense
     timeout: 30
@@ -90,6 +122,7 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
   deleteExpense:
     handler: handler.deleteExpense
     timeout: 30
@@ -103,6 +136,7 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
   totalSpendingByMonth:
     handler: handler.totalSpendingByMonth
     timeout: 30
@@ -116,6 +150,7 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
   spendingByCategory:
     handler: handler.spendingByCategory
     timeout: 30
@@ -131,17 +166,8 @@ functions:
             allowCredentials: false
 
 plugins:
-  - serverless-esbuild
   - serverless-offline
-
-custom:
-  esbuild:
-    bundle: true
-    minify: false
-    sourcemap: true
-    platform: "node"
-    target: "node20"
-    packager: pnpm
+  - serverless-esbuild
 
 resources:
   Resources:
@@ -182,17 +208,3 @@ resources:
                 - s3:GetObject
               Resource:
                 - !Sub "arn:aws:s3:::${FrontendBucket}/*"
-
-#     ExpensesTable:
-#       Type: AWS::DynamoDB::Table
-#       Properties:
-#         TableName: Expenses
-#         AttributeDefinitions:
-#           - AttributeName: "id"
-#             AttributeType: "S"
-#         KeySchema:
-#           - AttributeName: "id"
-#             KeyType: "HASH"
-#         ProvisionedThroughput:
-#           ReadCapacityUnits: 5
-#           WriteCapacityUnits: 5
