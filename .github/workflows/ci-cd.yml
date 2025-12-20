@@ -30,6 +30,10 @@ jobs:
         run: |
           pnpm install --no-frozen-lockfile
           pnpm install -g serverless@3.39.0
+
+      - name: Install serverless plugins
+        run: |
+          cd apps/backend/
           serverless plugin install -n serverless-esbuild
 
       - name: Run tests
