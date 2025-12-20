@@ -78,9 +78,8 @@ jobs:
         with:
           version: 9
 
-      - name: Install dependencies
+      - name: Install serverless globally
         run: |
-          pnpm install --no-frozen-lockfile
           pnpm install -g serverless@3.39.0
 
       - name: Set up AWS CLI
