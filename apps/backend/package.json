@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "serverless offline start",
-    "build": "sls dev",
+    "build": "sls package --stage prod",
     "start": "sls deploy",
     "clean": "sls remove",
     "lint:fix": "eslint src --ext .ts --fix",
