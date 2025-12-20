@@ -27,7 +27,9 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: |
+          pnpm install --no-frozen-lockfile
+          serverless plugin install -n serverless-esbuild
 
       - name: Run tests
         run: pnpm test
@@ -57,6 +59,7 @@ jobs:
         run: |
           cd apps/backend/
           pnpm install -g serverless@3.39.0
+          serverless plugin install -n serverless-esbuild
           serverless deploy --stage prod
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
