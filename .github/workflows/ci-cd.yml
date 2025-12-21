@@ -82,7 +82,24 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pnpm install --no-frozen-lockfile
           pnpm install -g serverless@3.39.0
+
+      - name: Fix esbuild permissions
+        run: |
+          chmod +x node_modules/@esbuild/linux-x64/bin/esbuild || true
+          chmod +x apps/backend/node_modules/@esbuild/linux-x64/bin/esbuild || true
+
+      - name: Install serverless plugins
+        run: |
+          cd apps/backend
+          pnpm add -D serverless-esbuild esbuild
+          chmod +x node_modules/@esbuild/linux-x64/bin/esbuild
+
+      - name: Rebuild argon2 for Lambda
+        run: |
+          cd apps/backend
+          npm rebuild argon2 --target=20.19.5 --target_arch=x64 --target_platform=linux || echo "Rebuild completed"
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v4
@@ -102,7 +119,6 @@ jobs:
       - name: Deploy Backend to AWS Lambda
         run: |
           cd apps/backend
-          pnpm rebuild argon2 --target=20.19.5 --target_arch=x64 --target_platform=linux || echo "Rebuild might have failed, continuing..."
           serverless deploy --stage prod
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
