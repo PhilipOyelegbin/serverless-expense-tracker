@@ -1,13 +1,42 @@
-service: expense-tracker-backend
+service: expense-tracker-app
+frameworkVersion: "3"
+useDotenv: true
 
 provider:
   name: aws
   runtime: nodejs20.x
   region: eu-west-2
+  architecture: x86_64
   stage: dev
   environment:
     MONGO_URI: ${env:MONGO_URI}
     JWT_SECRET: ${env:JWT_SECRET}
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    target: "node20"
+    platform: "node"
+    external:
+      - argon2
+    keepNames: true
+    tsconfig: tsconfig.json
+    exclude: ["aws-sdk"]
+    entryPoints:
+      - apps/backend/handler.ts
+    
+package:
+  patterns:
+    - "!**"
+    - "apps/backend/**"
+    - "packages/types/**"
+    - "node_modules/.pnpm/**"
+    - "node_modules/.pnpm/**/node_modules/argon2/**"
+    - "node_modules/.pnpm/**/node_modules/argon2/**/*.node"
+  individually: false
+  excludeDevDependencies: false
 
 functions:
   createUser:
@@ -17,6 +46,13 @@ functions:
       - http:
           path: users/signup
           method: post
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   loginUser:
     handler: handler.authUser
     timeout: 30
@@ -24,6 +60,13 @@ functions:
       - http:
           path: users/signin
           method: post
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   getExpenses:
     handler: handler.getExpenses
     timeout: 30
@@ -31,6 +74,13 @@ functions:
       - http:
           path: expenses
           method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   getExpensesById:
     handler: handler.getExpensesById
     timeout: 30
@@ -38,13 +88,13 @@ functions:
       - http:
           path: expenses/{id}
           method: get
-  listExpenses:
-    handler: handler.listExpenses
-    timeout: 30
-    events:
-      - http:
-          path: expenses/list
-          method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   addExpense:
     handler: handler.addExpense
     timeout: 30
@@ -52,6 +102,13 @@ functions:
       - http:
           path: expenses
           method: post
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   updateExpense:
     handler: handler.updateExpense
     timeout: 30
@@ -59,6 +116,13 @@ functions:
       - http:
           path: expenses/{id}
           method: put
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   deleteExpense:
     handler: handler.deleteExpense
     timeout: 30
@@ -66,6 +130,13 @@ functions:
       - http:
           path: expenses/{id}
           method: delete
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   totalSpendingByMonth:
     handler: handler.totalSpendingByMonth
     timeout: 30
@@ -73,6 +144,13 @@ functions:
       - http:
           path: expenses/total-spending-by-month
           method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   spendingByCategory:
     handler: handler.spendingByCategory
     timeout: 30
@@ -80,22 +158,53 @@ functions:
       - http:
           path: expenses/spending-by-category
           method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
 
 plugins:
   - serverless-offline
+  - serverless-esbuild
 
-# resources:
-#   Resources:
-#     ExpensesTable:
-#       Type: AWS::DynamoDB::Table
-#       Properties:
-#         TableName: Expenses
-#         AttributeDefinitions:
-#           - AttributeName: "id"
-#             AttributeType: "S"
-#         KeySchema:
-#           - AttributeName: "id"
-#             KeyType: "HASH"
-#         ProvisionedThroughput:
-#           ReadCapacityUnits: 5
-#           WriteCapacityUnits: 5
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: "AWS::ApiGateway::GatewayResponse"
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: "ApiGatewayRestApi"
+
+    FrontendBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: expense-tracker-0byqods6
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
+
+    FrontendBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref FrontendBucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: "*"
+              Action:
+                - s3:GetObject
+              Resource:
+                - !Sub "arn:aws:s3:::${FrontendBucket}/*"

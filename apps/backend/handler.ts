@@ -5,12 +5,18 @@ import {
   deleteExpenseService,
   getExpenseByIdService,
   getExpensesService,
-  listExpensesService,
   loginUserService,
   spendingByCategoryService,
   updateExpenseService,
   totalSpendingByMonthService,
 } from "./src/services";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Credentials": true,
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
+};
 
 // Lambda function to create a new user
 export const createUser = async (event: APIGatewayEvent) => {
@@ -19,6 +25,7 @@ export const createUser = async (event: APIGatewayEvent) => {
     if (!email || !password) {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({ message: "Email and password are required" }),
       };
     }
@@ -27,6 +34,7 @@ export const createUser = async (event: APIGatewayEvent) => {
     const result = await createUserService(user);
     return {
       statusCode: 201,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "User registered successfully",
         user: result,
@@ -35,6 +43,7 @@ export const createUser = async (event: APIGatewayEvent) => {
   } catch (error) {
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Failed to register user",
       }),
@@ -49,6 +58,7 @@ export const authUser = async (event: APIGatewayEvent) => {
     if (!email || !password) {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({ message: "Email and password are required" }),
       };
     }
@@ -57,6 +67,7 @@ export const authUser = async (event: APIGatewayEvent) => {
     const result = await loginUserService(user);
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Login successful",
         token: result.token,
@@ -65,6 +76,7 @@ export const authUser = async (event: APIGatewayEvent) => {
   } catch (error) {
     return {
       statusCode: 401,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Failed to login",
       }),
@@ -72,39 +84,52 @@ export const authUser = async (event: APIGatewayEvent) => {
   }
 };
 
-// Lambda function to fetch all expenses
+// Lambda function to fetch expenses and filter by optional parameters
 export const getExpenses = async (event: APIGatewayEvent) => {
   try {
-    const token = event.headers?.Authorization?.split(" ")[1];
+    const authHeader =
+      event.headers?.Authorization ?? event.headers?.authorization;
+    const token = authHeader?.split(" ")[1];
     if (!token) {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({ message: "Authorization token missing" }),
       };
     }
-    const result = await getExpensesService(token);
-    if (result.expenses.length === 0) {
+
+    const qs = event.queryStringParameters || {};
+    const filters = {
+      startDate: qs.startDate ?? "",
+      endDate: qs.endDate ?? "",
+      category: qs.category ?? "",
+    };
+    const { expenses } = await getExpensesService(token, filters);
+    if (expenses.length === 0) {
       return {
         statusCode: 404,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "No expenses found",
           expenses: [],
         }),
       };
     }
+
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({
-        message: "All expenses found",
-        expenses: result.expenses,
+        message: "Expenses fetched successfully",
+        expenses,
       }),
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Failed to fetch expenses",
-        error: error,
       }),
     };
   }
@@ -117,6 +142,7 @@ export const getExpensesById = async (event: APIGatewayEvent) => {
     if (!token) {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({ message: "Authorization token missing" }),
       };
     }
@@ -124,6 +150,7 @@ export const getExpensesById = async (event: APIGatewayEvent) => {
     if (!expenseId) {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({ message: "Expense ID is required" }),
       };
     }
@@ -131,6 +158,7 @@ export const getExpensesById = async (event: APIGatewayEvent) => {
     if (!result.expenses || result.expenses.length === 0) {
       return {
         statusCode: 404,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "No expenses found",
           expenses: [],
@@ -139,6 +167,7 @@ export const getExpensesById = async (event: APIGatewayEvent) => {
     }
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Expenses retrieved successfully",
         expenses: result.expenses,
@@ -147,58 +176,7 @@ export const getExpensesById = async (event: APIGatewayEvent) => {
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        message: "Failed to fetch expenses",
-        error: error,
-      }),
-    };
-  }
-};
-
-// Lambda function to list expenses with optional filters
-export const listExpenses = async (event: APIGatewayEvent) => {
-  const token = event.headers?.Authorization?.split(" ")[1];
-  if (!token) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ message: "Authorization token missing" }),
-    };
-  }
-
-  const { startDate, endDate, category } = event.queryStringParameters || {};
-  if (!startDate || !endDate) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ message: "Start date and end date are required" }),
-    };
-  }
-
-  try {
-    const params =
-      category !== undefined
-        ? { startDate, endDate, category }
-        : { startDate, endDate };
-    const result = await listExpensesService(params as any, token);
-    if (!result.expenses || result.expenses.length === 0) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({
-          message: "No expenses found",
-          expenses: [],
-        }),
-      };
-    }
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "Expenses retrieved successfully",
-        expenses: result.expenses,
-      }),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Failed to fetch expenses",
         error: error,
@@ -213,6 +191,7 @@ export const addExpense = async (event: APIGatewayEvent) => {
   if (!token) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Authorization token missing" }),
     };
   }
@@ -230,6 +209,7 @@ export const addExpense = async (event: APIGatewayEvent) => {
     );
     return {
       statusCode: 201,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "New expense created",
         expense: result.newExpense,
@@ -238,6 +218,7 @@ export const addExpense = async (event: APIGatewayEvent) => {
   } catch (error) {
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Failed to add expense", error: error }),
     };
   }
@@ -249,6 +230,7 @@ export const updateExpense = async (event: APIGatewayEvent) => {
   if (!token) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Authorization token missing" }),
     };
   }
@@ -256,6 +238,7 @@ export const updateExpense = async (event: APIGatewayEvent) => {
   if (!expenseId) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Expense ID is required" }),
     };
   }
@@ -274,11 +257,13 @@ export const updateExpense = async (event: APIGatewayEvent) => {
 
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Expense updated", expense: result }),
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Failed to update expense",
         error: error,
@@ -293,6 +278,7 @@ export const deleteExpense = async (event: APIGatewayEvent) => {
   if (!token) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Authorization token missing" }),
     };
   }
@@ -300,6 +286,7 @@ export const deleteExpense = async (event: APIGatewayEvent) => {
   if (!expenseId) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Expense ID is required" }),
     };
   }
@@ -308,11 +295,13 @@ export const deleteExpense = async (event: APIGatewayEvent) => {
     await deleteExpenseService(expenseId, token);
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Expense deleted" }),
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Failed to delete expense",
         error: error,
@@ -327,6 +316,7 @@ export const totalSpendingByMonth = async (event: APIGatewayEvent) => {
   if (!token) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Authorization token missing" }),
     };
   }
@@ -335,6 +325,7 @@ export const totalSpendingByMonth = async (event: APIGatewayEvent) => {
   if (!startDate || !endDate) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Start date and end date are required" }),
     };
   }
@@ -343,6 +334,7 @@ export const totalSpendingByMonth = async (event: APIGatewayEvent) => {
     const result = await totalSpendingByMonthService(token, startDate, endDate);
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Total spending by month retrieved successfully",
         spendingByMonth: result,
@@ -351,6 +343,7 @@ export const totalSpendingByMonth = async (event: APIGatewayEvent) => {
   } catch (error) {
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Failed to fetch total spending by month",
         error: error,
@@ -365,6 +358,7 @@ export const spendingByCategory = async (event: APIGatewayEvent) => {
   if (!token) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
       body: JSON.stringify({ message: "Authorization token missing" }),
     };
   }
@@ -374,15 +368,16 @@ export const spendingByCategory = async (event: APIGatewayEvent) => {
 
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Spending by category retrieved successfully",
         spendingByCategory: result,
       }),
     };
   } catch (error) {
-    console.error("Error fetching spending by category:", error);
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Failed to fetch spending by category",
         error: error,

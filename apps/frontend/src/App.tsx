@@ -1,35 +1,33 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthPage } from "./pages/auth/page";
+import { Dashboard } from "./pages/dashboard/page";
+import { useAuthStore } from "./store/useAuthStore";
+import { EditExpensePage } from "./pages/dashboard/EditExpensePage";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const token = useAuthStore((state) => state.token);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <BrowserRouter>
+      <Routes>
+        {/* If authenticated, redirect home to dashboard */}
+        <Route
+          path="/"
+          element={!token ? <AuthPage /> : <Navigate to="/dashboard" />}
+        />
 
-export default App
+        {/* Protected Route */}
+        <Route
+          path="/dashboard"
+          element={token ? <Dashboard /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/dashboard/expenses/edit/:id"
+          element={token ? <EditExpensePage /> : <Navigate to="/" />}
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;

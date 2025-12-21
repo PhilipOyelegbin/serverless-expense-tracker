@@ -25,6 +25,7 @@ export const generateJWT = (id: string, email: string): string => {
   });
 };
 
+// Decode JWT Token
 export const decodeToken = (token: string): any => {
   try {
     return jwt.verify(token, JWT_SECRET);

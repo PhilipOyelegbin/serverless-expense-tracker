@@ -1,10 +1,6 @@
 {
   "name": "personal-expense-tracker",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,7 +9,7 @@
     "dev": "pnpm -r run dev",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
-    "deploy": "cd apps/backend && cdk deploy"
+    "start": "pnpm -r run start"
   },
   "keywords": [],
   "author": "",
