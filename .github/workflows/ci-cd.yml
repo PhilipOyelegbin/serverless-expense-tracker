@@ -158,9 +158,8 @@ jobs:
         run: |
           pnpm install -g serverless@3.39.0
           aws s3 rm s3://expense-tracker-0byqods6 --recursive
-          ls -al
-          ls -al apps/backend/
           cd apps/backend/
+          serverless plugin install -n serverless-offline
           serverless remove --stage prod
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
