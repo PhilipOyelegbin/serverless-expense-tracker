@@ -47,14 +47,16 @@ jobs:
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          VITE_BASE_API_URL: ${{ secrets.VITE_BASE_API_URL }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: backend-build
+          name: app-build
           path: |
             apps/backend/
             packages/
+            apps/frontend/
             node_modules/
             package.json
             pnpm-lock.yaml
@@ -69,7 +71,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: backend-build
+          name: app-build
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -114,6 +116,8 @@ jobs:
           ls -la apps/ || echo "No apps directory"
           echo "---"
           ls -la apps/backend/ || echo "No backend directory"
+          echo "---"
+          ls -la apps/frontend/ || echo "No frontend directory"
 
       - name: Deploy Backend to AWS Lambda
         run: |
@@ -127,6 +131,7 @@ jobs:
         run: |
           cd apps/frontend/
           pnpm install
+          echo "VITE_BASE_API_URL: ${{ secrets.VITE_BASE_API_URL }}" > .env
           pnpm build
           aws s3 sync dist/ s3://expense-tracker-0byqods6 --delete
 

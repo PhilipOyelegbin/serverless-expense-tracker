@@ -158,15 +158,15 @@ To ensure a seamless development experience and maintain environmental hygiene, 
 **Frontend Endpoint:** http://expense-tracker-0byqods6.s3-website.eu-west-2.amazonaws.com/dashboard
 
 **Backend Endpoints:**
-- POST: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/users/signup
-- POST: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/users/signin
-- GET: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses
-- GET: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/{id}
-- POST: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses
-- PUT: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/{id}
-- DELETE: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/{id}
-- GET: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/total-spending-by-month
-- GET: https://vspc2lcnlh.execute-api.eu-west-2.amazonaws.com/dev/expenses/spending-by-category 
+- POST: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/users/signin
+- POST: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/users/signin
+- GET: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/expenses
+- GET: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/expenses/{id}
+- POST: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/expenses
+- PUT: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/expenses/{id}
+- DELETE: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/expenses/{id}
+- GET: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/expenses/total-spending-by-month
+- GET: https://cf32apxaol.execute-api.eu-west-2.amazonaws.com/prod/expenses/spending-by-category 
 
 ![snapshot](./preview.png)
 
