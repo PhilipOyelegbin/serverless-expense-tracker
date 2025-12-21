@@ -145,9 +145,9 @@ To ensure a seamless development experience and maintain environmental hygiene, 
 
 - **Continuous Integration**: Every push/pull-request to the `staging` branch triggers an automated pipeline that runs your Vitest suite, builds the frontend assets, and backend.
 
-- **Continuous Deployment**: Every push/pull-request to the `main` branch triggers an automated pipeline that executes `serverless deploy`. This ensures your production environment always reflects the latest stable code.
+- **Continuous Deployment**: Every push/pull-request to the `main` branch triggers an automated pipeline that executes `serverless deploy --stage prod` and `aws s3 sync dist/ s3://expense-tracker-0byqods6 --delete`. This ensures your production environment always reflects the latest stable code.
 
-- **Infrastructure Cleanup**: To avoid "infrastructure drift" and unnecessary AWS charges, a cleanup workflow is configured. This can be triggered manually or set to run automatically when a pull-request is merged and closed, executing `serverless remove` to tear down temporary stacks.
+- **Infrastructure Cleanup**: To avoid "infrastructure drift" and unnecessary AWS charges, a cleanup workflow is configured. This can be triggered manually or set to run automatically when a pull-request to `clean` branch is merged and closed, executing `aws s3 rm s3://expense-tracker-0byqods6 --recursive` and `serverless remove --stage prod` to tear down temporary stacks.
 
 ---
 
@@ -178,6 +178,6 @@ To ensure a seamless development experience and maintain environmental hygiene, 
 - **Cost Control**: Automated cleanup ensures you only pay for the resources you are actively using.
 - **Reliability**: Integrated testing prevents broken code from ever reaching your production environment.
 
-> **Note**: Ensure you have added your `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `MONGODB_URI` to your **GitHub Repository Secrets** for the workflows to authenticate correctly.
+> **Note**: Ensure you have added your `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `MONGO_URI`, `JWT_SECRET`, and `VITE_BASE_API_URL` to your **GitHub Repository Secrets** for the workflows to authenticate correctly.
 
 ---
