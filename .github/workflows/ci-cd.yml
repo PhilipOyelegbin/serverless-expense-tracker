@@ -59,6 +59,7 @@ jobs:
             package.json
             pnpm-lock.yaml
             pnpm-workspace.yaml
+            tsconfig.json
 
   deploy:
     runs-on: ubuntu-latest
