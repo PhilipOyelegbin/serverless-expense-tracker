@@ -1,0 +1,14 @@
+services:
+  mongo_db:
+    image: mongo:latest
+    container_name: expense_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: philip
+      MONGO_INITDB_ROOT_PASSWORD: Mogdb;D0c.
+    ports:
+      - "27017:27017"
+    volumes:
+      - expense-data:/data/db
+
+volumes:
+  expense-data:
