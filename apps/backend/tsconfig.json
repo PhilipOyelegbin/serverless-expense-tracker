@@ -7,7 +7,7 @@
     "moduleResolution": "NodeNext",
     "types": ["node"],
     "paths": {
-        "@your-project/types": ["../../packages/types/src"]
+      "@your-project/types": ["../../packages/types/src"]
     }
   },
   "include": ["src/**/*"],
